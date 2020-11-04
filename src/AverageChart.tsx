@@ -228,6 +228,15 @@ function AverageChart({
             mousemove(d);
           }
         })
+        // Bug in d3-types, d is not number
+        // @ts-ignore
+        .on("click", (_, d: FairytaleData) => {
+          setBrushText(d.sentences.map((d) => d.sentence).join(""));
+          setBrushTitle(d.title);
+          const mean = d3.mean(d.sentences, (d) => d[setting]);
+          setBrushAverage(mean ? +mean.toFixed(2) : 0);
+          setBrushCompletion(100);
+        })
         .transition()
         .duration(1000)
         .attr("y", (d) => {
@@ -246,17 +255,7 @@ function AverageChart({
           }
           return 0;
         })
-        .attr("fill", theme.palette.primary.main)
-        // Bug in d3-types, d is not number
-        // @ts-ignore
-        .on("click", (_, d: FairytaleData) => {
-          setBrushText(d.sentences.map((d) => d.sentence).join(""));
-          setBrushTitle(d.title);
-          const mean = d3.mean(d.sentences, (d) => d[setting]);
-          setBrushAverage(mean ? +mean.toFixed(2) : 0);
-          setBrushCompletion(100);
-        });
-
+        .attr("fill", theme.palette.primary.main);
       svgRef.current.select(".tooltip").remove();
       tooltip.current = svgRef.current
         .append("g")
